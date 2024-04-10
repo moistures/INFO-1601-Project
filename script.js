@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('https://restcountries.com/v3.1/all');
             countriesData = await response.json();
-            countriesData.sort((a, b) => a.name.common.localeCompare(b.name.common)); // Default alphabetical sort
+            countriesData.sort((a, b) => a.name.common.localeCompare(b.name.common));
             populateLanguagesDropdown();
             displayCountries(countriesData);
         } catch (error) {
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayCountries(countries) {
-        countriesContainer.innerHTML = ''; // Clear the container first
+        countriesContainer.innerHTML = '';
         countries.forEach(country => {
             const countryElement = document.createElement('div');
             countryElement.className = 'country-card';
@@ -53,9 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
                 <p><strong>Capital:</strong> ${country.capital ? country.capital[0] : 'N/A'}</p>
             `;
-            countryElement.style.animation = 'none'; // Disable animation initially
-            countryElement.offsetHeight; // Trigger reflow
-            countryElement.style.animation = null; // Enable animation
+            countryElement.style.animation = 'none';
+            countryElement.offsetHeight;
+            countryElement.style.animation = null;
             countryElement.onclick = () => openModal(country);
             countriesContainer.appendChild(countryElement);
         });
@@ -85,16 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function sortAndFilterCountries() {
-        let sortedCountries = [...countriesData]; // Copy of the data to sort and filter
+        let sortedCountries = [...countriesData];
 
-        // Apply population sort if selected
         if (populationSort.value === 'asc') {
             sortedCountries.sort((a, b) => a.population - b.population);
         } else if (populationSort.value === 'desc') {
             sortedCountries.sort((a, b) => b.population - a.population);
         }
 
-        // Filter by continent, language, and search text
         sortedCountries = sortedCountries.filter(country => {
             const matchesContinent = continentSelect.value ? country.region === continentSelect.value : true;
             const matchesLanguage = languageSelect.value ? country.languages && Object.values(country.languages).includes(languageSelect.value) : true;
@@ -102,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchesContinent && matchesLanguage && matchesSearchText;
         });
 
-        // Apply default alphabetical sort if no population sort selected
         if (!populationSort.value) {
             sortedCountries.sort((a, b) => a.name.common.localeCompare(b.name.common));
         }
