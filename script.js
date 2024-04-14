@@ -1,3 +1,14 @@
+let map;
+let marker;
+
+// Function to initialize the map
+window.initMap = function() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 48.8584, lng: 2.2945},
+        zoom: 5
+    });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const countriesContainer = document.getElementById('countries-list');
     const searchBox = document.getElementById('search-box');
@@ -6,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const populationSort = document.getElementById('population-sort');
     const modal = document.getElementById('country-modal');
     const closeModalIcon = document.querySelector('.close-icon');
-    const countryDetails = document.getElementById('country-details');
 
     let countriesData = [];
 
@@ -53,34 +63,70 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
                 <p><strong>Capital:</strong> ${country.capital ? country.capital[0] : 'N/A'}</p>
             `;
-            countryElement.style.animation = 'none';
-            countryElement.offsetHeight;
-            countryElement.style.animation = null;
             countryElement.onclick = () => openModal(country);
             countriesContainer.appendChild(countryElement);
         });
     }
 
     function openModal(country) {
-        countryDetails.innerHTML = `
-            <img src="${country.flags.svg}" alt="Flag of ${country.name.common}" style="width: 100%; border-radius: 0;">
-            <div class="country-info">
-                <h1>${country.name.common}</h1>
-                <p><strong>Capital:</strong> ${country.capital ? country.capital[0] : 'N/A'}</p>
-                <p><strong>Region:</strong> ${country.region}</p>
-                <p><strong>Subregion:</strong> ${country.subregion}</p>
-                <p><strong>Languages:</strong> ${country.languages ? Object.values(country.languages).join(', ') : 'N/A'}</p>
-                <p><strong>Currencies:</strong> ${country.currencies ? Object.values(country.currencies).map(c => `${c.name} (${c.symbol})`).join(', ') : 'N/A'}</p>
-                <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
-                <a href="${country.tld[0] ? `https://en.wikipedia.org/wiki/${country.name.common}` : '#'}" target="_blank" class="details-link">More details</a>
-            </div>
-        `;
+        const countryDetails = document.getElementById('country-details');
+        const modalFlag = document.getElementById('modal-flag');
         modal.classList.add('visible');
+
+        modalFlag.src = country.flags.svg;
+        modalFlag.alt = "Flag of " + country.name.common;
+
+        countryDetails.innerHTML = `
+            <h1>${country.name.common}</h1>
+            <p><strong>Capital:</strong> ${country.capital ? country.capital[0] : 'N/A'}</p>
+            <p><strong>Region:</strong> ${country.region}</p>
+            <p><strong>Subregion:</strong> ${country.subregion}</p>
+            <p><strong>Languages:</strong> ${country.languages ? Object.values(country.languages).join(', ') : 'N/A'}</p>
+            <p><strong>Currencies:</strong> ${country.currencies ? Object.values(country.currencies).map(c => `${c.name} (${c.symbol})`).join(', ') : 'N/A'}</p>
+            <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
+            <p><a href="${country.tld[0] ? `https://en.wikipedia.org/wiki/${country.name.common}` : '#'}" target="_blank" class="details-link">More details</a></p>
+            <a href="${country.maps.googleMaps}" target="_blank" class="details-link">View in Google Maps</a>
+        `;
+
+        if (country.latlng && country.latlng.length === 2) {
+            setMapLocation(country.latlng[0], country.latlng[1], country.name.common);
+        } else {
+            console.log("Latitude and longitude data is missing.");
+        }
+    }
+
+    function setMapLocation(lat, lng, countryName) {
+        if (map) {
+            const location = new google.maps.LatLng(lat, lng);
+            map.setCenter(location);
+            map.setZoom(6);
+
+            if (marker) marker.setMap(null);
+
+            marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: countryName
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: `<div class="info-content"><strong>${countryName}</strong></div>`
+            });
+
+            marker.addListener('click', function() {
+                infoWindow.open(map, marker);
+            });
+
+            infoWindow.open(map, marker);
+        } else {
+            console.log("Map object is not initialized yet.");
+        }
     }
 
     modal.addEventListener('click', function(event) {
         if (event.target === modal || event.target === closeModalIcon) {
             modal.classList.remove('visible');
+            if (marker) marker.setMap(null);  
         }
     });
 
