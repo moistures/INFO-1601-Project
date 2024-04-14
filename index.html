@@ -16,15 +16,6 @@
         }
         </style>
 </head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countries Info</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-</head>
 <body>
     <div class="title-bar">
         <h1>Countries Information</h1>
@@ -48,16 +39,23 @@
             <option value="desc">High to Low</option>
         </select>
     </div>
-      
-    </div>
     <div id="countries-list" class="countries-container"></div>
 
     <div id="country-modal" class="modal hidden">
         <div class="modal-content">
             <span class="material-symbols-outlined close-icon">close</span>
-            <div id="country-details" class="country-details"></div>
+            <div class="modal-body">
+                <img src="" alt="Country flag" id="modal-flag" class="modal-flag">
+                <div class="details-and-map">
+                    <div id="country-details" class="country-details"></div>
+                    <div id="map" class="map"></div>
+                </div>
+            </div>
         </div>
     </div>
+       
     <script src="script.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4DU3liaR-s6LvT3RxGC_ia_cv4ArZ7ec&callback=initMap"></script>
+
 </body>
 </html>
